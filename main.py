@@ -1,10 +1,12 @@
-from datetime import date, datetime
-import math
-from wechatpy import WeChatClient
-from wechatpy.client.api import WeChatMessage, WeChatTemplate
-import requests
+ import random
+from time import time, localtime
+import cityinfo
+from requests import get, post
+from datetime import datetime, date
+import sys
 import os
-import random
+import http.client, urllib
+import json
 
 today = datetime.now()
 start_date = os.environ['START_DATE']
@@ -26,7 +28,7 @@ def get_weather(province, city):
         print("推送消息失败，请检查省份或城市是否正确")
         os.system("pause")
         sys.exit(1)
-    # city_id = 101280101
+    # city_id = 101240101
     # 毫秒级时间戳
     t = (int(round(time() * 1000)))
     headers = {
@@ -49,6 +51,20 @@ def get_weather(province, city):
     tempn = weatherinfo["tempn"]
     return weather, temp, tempn
 
+def get_ciba():
+    if (Whether_Eng!="否"):
+        url = "http://open.iciba.com/dsapi/"
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+        }
+        r = get(url, headers=headers)
+        note_en = r.json()["content"]
+        note_ch = r.json()["note"]
+        return note_ch, note_en
+    else:
+        return "",""
 
 def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
@@ -74,6 +90,30 @@ client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
 wea, temperature = get_weather()
-data = {"weather":{"value":wea},"temperature":{"value":temperature},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
+ "date":{
+                "value": "{} {}".format(today, week),
+                "color": get_color()
+            },
+            "city": {
+                "value": city_name,
+                "color": get_color()
+            },
+            "weather": {
+                "value": weather,
+                "color": get_color()
+            },
+            "min_temperature": {
+                "value": min_temperature,
+                "color": get_color()
+            },
+            "max_temperature": {
+                "value": max_temperature,
+                "color": get_color()
+            },
+            "love_day": {
+                "value": love_days,
+                "color": get_color()
+            }}
+
 res = wm.send_template(user_id, template_id, data)
 print(res)
