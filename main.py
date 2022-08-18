@@ -113,7 +113,7 @@ wea, temperature = get_weather()
             "love_day": {
                 "value": love_days,
                 "color": get_color()
-            }}
+            },
 
 res = wm.send_template(user_id, template_id, data)
 print(res)
